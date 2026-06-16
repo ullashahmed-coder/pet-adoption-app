@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Details - Pet Adoption</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-peach: #ffaa80;
+            --hover-peach: #ff8c5a;
+            --mint-green: #d0f0c0;
+            --dark-blue: #2c3e50;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-gray: #666;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', 'Hind Siliguri', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--dark-blue); }
+
+        /* Navbar */
+        header {
+            background-color: var(--card-bg); padding: 15px 50px; display: flex;
+            justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary-peach); text-decoration: none; display: flex; align-items: center; gap: 10px;}
+        .back-btn { background: #f0f2f1; color: var(--dark-blue); padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s; }
+        .back-btn:hover { background: #e2e6e4; }
+
+        /* Main Details Section */
+        main { padding: 40px 50px; max-width: 1200px; margin: 0 auto; }
+        
+        .details-container {
+            display: flex; gap: 40px; background: var(--card-bg); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Image Section */
+        .image-section { flex: 1; border-radius: 15px; overflow: hidden; position: relative; max-height: 500px; }
+        .image-section img { width: 100%; height: 100%; object-fit: cover; border-radius: 15px; }
+        .badge { position: absolute; top: 20px; left: 20px; background: var(--mint-green); color: #2b5329; padding: 8px 15px; border-radius: 25px; font-weight: 700; font-size: 14px;}
+
+        /* Info Section */
+        .info-section { flex: 1; display: flex; flex-direction: column; }
+        .pet-title { font-size: 36px; font-weight: 700; margin-bottom: 5px; color: var(--dark-blue); }
+        .pet-subtitle { font-size: 18px; color: var(--text-gray); margin-bottom: 20px; }
+        
+        .fee-tag { font-size: 20px; font-weight: 700; color: var(--primary-peach); margin-bottom: 25px; }
+
+        .info-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;
+        }
+        .info-box { background: #f8f9fa; padding: 15px; border-radius: 12px; border: 1px solid #eee; }
+        .info-box span { display: block; font-size: 12px; color: var(--text-gray); margin-bottom: 5px; }
+        .info-box strong { font-size: 15px; color: var(--dark-blue); }
+
+        .description { line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px; }
+
+        .adopt-btn {
+            background: var(--primary-peach); color: #fff; border: none; padding: 15px 30px; border-radius: 12px;
+            font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; text-align: center; width: 100%;
+            margin-top: auto;
+        }
+        .adopt-btn:hover { background: var(--hover-peach); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 170, 128, 0.3); }
+
+        .loading { text-align: center; padding: 100px; font-size: 20px; color: #666; width: 100%; }
+        
+        @media (max-width: 900px) {
+            .details-container { flex-direction: column; padding: 20px; }
+            main { padding: 20px; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="dashboard.html" class="logo">🐾 PetAdopt</a>
+        <a href="dashboard.html" class="back-btn">⬅ ফিরে যান</a>
+    </header>
+
+    <main id="main-content">
+        <div class="loading">ডেটা লোড হচ্ছে... দয়া করে অপেক্ষা করুন ⏳</div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        // 🔴 ইমপোর্ট আপডেট করা হয়েছে 🔴
+        import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDf00oO6ALBMs9902GTcrxTn_UVSdoIjiE",
+            authDomain: "pet-adoption-app-11812.firebaseapp.com",
+            projectId: "pet-adoption-app-11812",
+            storageBucket: "pet-adoption-app-11812.firebasestorage.app",
+            messagingSenderId: "365981358842",
+            appId: "1:365981358842:web:b8e651acd7753a2eee0743",
+            measurementId: "G-8TF742MTJB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const petId = urlParams.get('id');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "index.html"; 
+                return;
+            }
+
+            if (!petId) {
+                document.getElementById('main-content').innerHTML = "<div class='loading' style='color:red;'>কোনো প্রাণীর তথ্য পাওয়া যায়নি! 😔</div>";
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "pets", petId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const pet = docSnap.data();
+                    let feeText = pet.fee === "0" || pet.fee === 0 ? "সম্পূর্ণ ফ্রি (Free)" : `৳ ${pet.fee}`;
+
+                    const detailsHTML = `
+                        <div class="details-container">
+                            <div class="image-section">
+                                <span class="badge">${pet.category}</span>
+                                <img src="${pet.imageUrl}" alt="${pet.name}" onerror="this.src='https://via.placeholder.com/600x500?text=No+Image'">
+                            </div>
+                            
+                            <div class="info-section">
+                                <h1 class="pet-title">${pet.name}</h1>
+                                <p class="pet-subtitle">${pet.breed} • ${pet.location}</p>
+                                
+                                <div class="fee-tag">অ্যাডপশন ফি: ${feeText}</div>
+
+                                <div class="info-grid">
+                                    <div class="info-box"><span>বয়স</span><strong>${pet.age}</strong></div>
+                                    <div class="info-box"><span>লিঙ্গ</span><strong>${pet.gender}</strong></div>
+                                    <div class="info-box"><span>রঙ</span><strong>${pet.color}</strong></div>
+                                    <div class="info-box"><span>আকার</span><strong>${pet.size}</strong></div>
+                                    <div class="info-box"><span>ভ্যাকসিন দেওয়া?</span><strong>${pet.vaccinated}</strong></div>
+                                    <div class="info-box"><span>নিউটার/স্পে করা?</span><strong>${pet.spayed}</strong></div>
+                                    <div class="info-box"><span>অন্য প্রাণীর সাথে আচরণ</span><strong>${pet.behavior}</strong></div>
+                                    <div class="info-box"><span>স্বাস্থ্য</span><strong>${pet.health}</strong></div>
+                                </div>
+
+                                <div class="description">
+                                    <strong>বিস্তারিত বিবরণ:</strong><br><br>
+                                    ${pet.description}
+                                </div>
+
+                                <button class="adopt-btn" id="btn-apply-adopt">দত্তক নেওয়ার জন্য আবেদন করুন 🐾</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('main-content').innerHTML = detailsHTML;
+
+                    // 🐾 স্মার্ট আবেদন পাঠানোর লজিক (ডুপ্লিকেট চেকসহ)
+                    document.getElementById('btn-apply-adopt').addEventListener('click', async () => {
+                        const adoptBtn = document.getElementById('btn-apply-adopt');
+                        adoptBtn.textContent = "চেক করা হচ্ছে... ⏳";
+                        adoptBtn.disabled = true;
+
+                        try {
+                            // ১. চেক করা: এই ইউজার কি এই প্রাণীর জন্য ইতিমধ্যে আবেদন করেছে?
+                            const q = query(
+                                collection(db, "adoptionRequests"), 
+                                where("applicantUid", "==", user.uid), 
+                                where("petId", "==", petId),
+                                where("status", "==", "Pending")
+                            );
+                            const existingRequest = await getDocs(q);
+
+                            if (!existingRequest.empty) {
+                                alert("আপনি ইতিমধ্যে এই প্রাণীটির জন্য আবেদন করেছেন! অনুগ্রহ করে অ্যাডমিনের সিদ্ধান্তের অপেক্ষা করুন। 🐾");
+                                adoptBtn.textContent = "ইতিমধ্যে আবেদন করেছেন ✅";
+                                return; // আবেদন পাঠানো হবে না
+                            }
+
+                            // ২. যদি আবেদন না করে থাকে, তবেই প্রসেস হবে
+                            adoptBtn.textContent = "আবেদন পাঠানো হচ্ছে... ⏳";
+                            const userDoc = await getDoc(doc(db, "users", user.uid));
+                            let applicantName = user.email.split('@')[0];
+                            let applicantPhone = "দেওয়া হয়নি";
+                            let applicantEmail = user.email;
+
+                            if (userDoc.exists()) {
+                                const userData = userDoc.data();
+                                applicantName = userData.name || applicantName;
+                                applicantPhone = userData.phone || applicantPhone;
+                            }
+
+                            await addDoc(collection(db, "adoptionRequests"), {
+                                petId: petId,
+                                petName: pet.name,
+                                applicantUid: user.uid,
+                                applicantName: applicantName,
+                                applicantPhone: applicantPhone,
+                                applicantEmail: applicantEmail,
+                                status: "Pending",
+                                requestDate: serverTimestamp()
+                            });
+
+                            alert("আপনার আবেদন সফলভাবে পাঠানো হয়েছে! 🎉");
+                            adoptBtn.textContent = "আবেদন সম্পন্ন হয়েছে ✅";
+                            adoptBtn.style.background = "#27ae60"; 
+                            adoptBtn.style.color = "#fff";
+
+                        } catch (error) {
+                            console.error("Error:", error);
+                            alert("আবেদন পাঠাতে সমস্যা হচ্ছে!");
+                            adoptBtn.textContent = "দত্তক নেওয়ার জন্য আবেদন করুন 🐾";
+                            adoptBtn.disabled = false;
+                        }
+                    });
+
+                } else {
+                    document.getElementById('main-content').innerHTML = "<div class='loading' style='color:red;'>প্রাণীটি ইতিমধ্যে দত্তক নেওয়া হয়েছে অথবা ডেটাবেসে নেই! 😔</div>";
+                }
+            } catch (error) {
+                console.error("Error getting document:", error);
+                document.getElementById('main-content').innerHTML = "<div class='loading' style='color:red;'>সার্ভার থেকে তথ্য লোড করতে সমস্যা হচ্ছে!</div>";
+            }
+        });
+    </script>
+</body>
+</html>

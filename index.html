@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Adoption - Smart Login & Registration</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap');
+
+        :root {
+            --primary-peach: #ffaa80;
+            --hover-peach: #ff8c5a;
+            --mint-green: #d0f0c0;
+            --dark-blue: #2c3e50;
+            --text-gray: #666;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --blur: blur(10px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Language Toggle Button */
+        .lang-toggle-container {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border: 2px solid var(--primary-peach);
+            color: var(--dark-blue);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lang-btn:hover {
+            background: var(--primary-peach);
+            color: #fff;
+        }
+
+        /* Background animated elements */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(50px);
+            animation: float-bg 8s infinite ease-in-out;
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            background: var(--primary-peach);
+            top: 10%;
+            left: 10%;
+            opacity: 0.3;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: var(--mint-green);
+            bottom: 5%;
+            right: 5%;
+            opacity: 0.4;
+            animation-delay: -4s;
+        }
+
+        @keyframes float-bg {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-30px) scale(1.1);
+            }
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            width: 900px;
+            max-width: 95%;
+            height: 550px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .welcome-section {
+            width: 45%;
+            background: linear-gradient(135deg, rgba(255, 218, 185, 0.7), rgba(208, 240, 192, 0.7));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            color: var(--dark-blue);
+        }
+
+        .welcome-section h2 {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .welcome-section h2 span.dynamic-greet {
+            display: block;
+            font-size: 20px;
+            font-weight: 400;
+            color: var(--hover-peach);
+            margin-top: 5px;
+        }
+
+        .welcome-section p {
+            font-size: 15px;
+            margin-bottom: 30px;
+            color: #555;
+            opacity: 0.8;
+        }
+
+        .floating-pet-svg {
+            width: 200px;
+            height: auto;
+            animation: floating 4s infinite ease-in-out;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(3deg);
+            }
+        }
+
+        .form-section {
+            width: 55%;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #ffffff;
+        }
+
+        .form-container {
+            display: none;
+            flex-direction: column;
+            animation: formFadeIn 0.5s ease-in-out forwards;
+        }
+
+        .form-container.active {
+            display: flex;
+        }
+
+        @keyframes formFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h3 {
+            font-size: 26px;
+            margin-bottom: 25px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 20px;
+            padding-right: 50px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            background-color: #f0f2f1;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            background-color: #ffffff;
+            border-color: var(--primary-peach);
+            box-shadow: 0 5px 15px rgba(255, 170, 128, 0.2);
+        }
+
+        input:not(:placeholder-shown):valid {
+            border-color: #81c784;
+        }
+
+        input:not(:placeholder-shown):invalid {
+            border-color: #e57373;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #aaa;
+            transition: 0.2s;
+            display: flex;
+        }
+
+        .eye-icon:hover {
+            color: var(--text-gray);
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-peach);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(255, 170, 128, 0.3);
+        }
+
+        button.submit-btn:hover {
+            background: var(--hover-peach);
+        }
+
+        button.submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #eee;
+        }
+
+        .separator:not(:empty)::before {
+            margin-right: 15px;
+        }
+
+        .separator:not(:empty)::after {
+            margin-left: 15px;
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            color: var(--text-gray);
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .google-btn:hover {
+            background: #fdfcfb;
+            border-color: #bbb;
+        }
+
+        .google-btn svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .toggle-text span {
+            color: var(--primary-peach);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .toggle-text span:hover {
+            color: var(--hover-peach);
+        }
+
+        @media (max-width: 850px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                border-radius: 20px;
+            }
+
+            .welcome-section,
+            .form-section {
+                width: 100%;
+            }
+
+            .welcome-section {
+                padding: 30px;
+            }
+
+            .floating-pet-svg {
+                width: 150px;
+            }
+
+            .lang-toggle-container {
+                top: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="lang-toggle-container">
+        <button class="lang-btn" id="langToggleBtn" onclick="toggleLanguage()">
+            🌐 English
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="welcome-section">
+            <svg class="floating-pet-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#2c3e50"
+                    d="M376 112c-44.1 0-80 35.9-80 80 0 22.3 9.3 42.4 24.1 56.6C279.1 234.6 240.1 216 192 216c-44.1 0-80 35.9-80 80 0 44.1 35.9 80 80 80s80-35.9 80-80c0-22.3-9.3-42.4-24.1-56.6C296.9 273.4 335.9 292 384 292c44.1 0 80-35.9 80-80 0-44.1-35.9-80-80-80z" />
+                <path fill="#ffaa80"
+                    d="M192 360c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm192-164c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48z" />
+                <path fill="#ffffff"
+                    d="M192 300c11 0 20 9 20 20s-9 20-20 20-20-9-20-20 9-20 20-20zm192-164c11 0 20 9 20 20s-9 20-20 20-20-9-20-20 9-20 20-20z" />
+                <circle cx="192" cy="320" r="10" />
+                <circle cx="384" cy="156" r="10" />
+            </svg>
+            <h2><span id="txt-welcome">নতুন সদস্য চাই?</span> <span class="dynamic-greet" id="txt-greeting"></span></h2>
+            <p id="txt-sub">আপনার পরিবারের সাথে একটি প্রিয় পোষা প্রাণীর মায়ার বাঁধন গড়ে তুলুন।</p>
+        </div>
+
+        <div class="form-section">
+
+            <div id="login-form" class="form-container active">
+                <h3 id="txt-login-title">স্বাগতম, পেট লাভার!</h3>
+                <div class="input-group">
+                    <input type="email" id="ph-email-login" placeholder="ইমেইল অ্যাড্রেস (example@email.com)" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="ph-pass-login" placeholder="পাসওয়ার্ড" required>
+                    <span class="eye-icon" onclick="togglePasswordVisibility('ph-pass-login', this)">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </span>
+                </div>
+                <button class="submit-btn" id="btn-login">লগইন</button>
+
+                <div class="separator" id="txt-or">অথবা</div>
+
+                <button class="google-btn" id="btn-google">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4" />
+                        <path
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853" />
+                        <path
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            fill="#FBBC05" />
+                        <path
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335" />
+                        <path d="M0 0h24v24H0z" fill="none" />
+                    </svg>
+                    <span id="txt-google-login">গুগল দিয়ে লগইন করুন</span>
+                </button>
+
+                <p class="toggle-text"><span id="txt-no-acc">অ্যাকাউন্ট নেই?</span> <span onclick="toggleForm()"
+                        id="link-reg">নিবন্ধন করুন</span></p>
+            </div>
+
+            <div id="register-form" class="form-container">
+                <h3 id="txt-reg-title">নিবন্ধন করুন</h3>
+                <div class="input-group">
+                    <input type="text" id="ph-name" placeholder="সম্পূর্ণ নাম" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="ph-email-reg" placeholder="ইমেইল অ্যাড্রেস" required
+                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="ph-phone" placeholder="ফোন নম্বর" required pattern="[0-9]{11}">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="ph-pass-reg" placeholder="নতুন পাসওয়ার্ড" required>
+                    <span class="eye-icon" onclick="togglePasswordVisibility('ph-pass-reg', this)">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </span>
+                </div>
+                <button class="submit-btn" id="btn-reg">নিবন্ধন সম্পন্ন করুন</button>
+                <p class="toggle-text"><span id="txt-has-acc">ইতিমধ্যে অ্যাকাউন্ট আছে?</span> <span
+                        onclick="toggleForm()" id="link-login">লগইন করুন</span></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDf00oO6ALBMs9902GTcrxTn_UVSdoIjiE",
+            authDomain: "pet-adoption-app-11812.firebaseapp.com",
+            projectId: "pet-adoption-app-11812",
+            storageBucket: "pet-adoption-app-11812.firebasestorage.app",
+            messagingSenderId: "365981358842",
+            appId: "1:365981358842:web:b8e651acd7753a2eee0743",
+            measurementId: "G-8TF742MTJB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.isProcessRunning = false;
+
+        // 🔒 একাধিক অ্যাডমিনের লিস্ট
+        const ADMIN_EMAILS = ["ullashahmed2003@gmail.com", "partner@gmail.com", "admin3@gmail.com"];
+
+        // অটো-লগইন চেক
+        onAuthStateChanged(auth, (user) => {
+            if (user && !window.isProcessRunning) {
+                if (ADMIN_EMAILS.includes(user.email)) {
+                    window.location.href = "admin.html";
+                } else {
+                    window.location.href = "dashboard.html";
+                }
+            }
+        });
+
+        // Language & UI Logic (Translations)
+        const translations = {
+            bn: {
+                btnToggle: "🌐 English", welcome: "নতুন সদস্য চাই?", sub: "আপনার পরিবারের সাথে একটি প্রিয় পোষা প্রাণীর মায়ার বাঁধন গড়ে তুলুন।",
+                loginTitle: "স্বাগতম, পেট লাভার!", emailLogin: "ইমেইল অ্যাড্রেস (example@email.com)", passLogin: "পাসওয়ার্ড",
+                btnLogin: "লগইন", or: "অথবা", btnGoogle: "গুগল দিয়ে লগইন করুন", noAcc: "অ্যাকাউন্ট নেই?", linkReg: "নিবন্ধন করুন",
+                regTitle: "নিবন্ধন করুন", name: "সম্পূর্ণ নাম", emailReg: "ইমেইল অ্যাড্রেস", phone: "ফোন নম্বর",
+                passReg: "নতুন পাসওয়ার্ড", btnReg: "নিবন্ধন সম্পন্ন করুন", hasAcc: "ইতিমধ্যে অ্যাকাউন্ট আছে?", linkLogin: "লগইন করুন",
+                morning: "সুপ্রভাত!", afternoon: "শুভ অপরান্হ!", evening: "শুভ সন্ধ্যা!", night: "শুভ রাত্রি!"
+            },
+            en: {
+                btnToggle: "🌐 বাংলা", welcome: "Looking for a new member?", sub: "Build a loving bond with a dear pet in your family.",
+                loginTitle: "Welcome, Pet Lover!", emailLogin: "Email Address (example@email.com)", passLogin: "Password",
+                btnLogin: "Login", or: "OR", btnGoogle: "Login with Google", noAcc: "Don't have an account?", linkReg: "Register",
+                regTitle: "Create an Account", name: "Full Name", emailReg: "Email Address", phone: "Phone Number",
+                passReg: "New Password", btnReg: "Complete Registration", hasAcc: "Already have an account?", linkLogin: "Login",
+                morning: "Good Morning!", afternoon: "Good Afternoon!", evening: "Good Evening!", night: "Good Night!"
+            }
+        };
+
+        window.currentLang = 'bn';
+
+        function setDynamicGreeting() {
+            const greetingSpan = document.getElementById('txt-greeting');
+            const hour = new Date().getHours();
+            let greetKey = "morning";
+            if (hour >= 12 && hour < 17) greetKey = "afternoon";
+            else if (hour >= 17 && hour < 22) greetKey = "evening";
+            else if (hour >= 22 || hour < 5) greetKey = "night";
+            greetingSpan.textContent = translations[window.currentLang][greetKey] + (window.currentLang === 'bn' ? " স্বাগতম!" : " Welcome!");
+        }
+
+        function updateTexts() {
+            const t = translations[window.currentLang];
+            document.getElementById('langToggleBtn').textContent = t.btnToggle;
+            document.getElementById('txt-welcome').textContent = t.welcome;
+            document.getElementById('txt-sub').textContent = t.sub;
+            document.getElementById('txt-login-title').textContent = t.loginTitle;
+            document.getElementById('btn-login').textContent = t.btnLogin;
+            document.getElementById('txt-or').textContent = t.or;
+            document.getElementById('txt-google-login').textContent = t.btnGoogle;
+            document.getElementById('txt-no-acc').textContent = t.noAcc;
+            document.getElementById('link-reg').textContent = t.linkReg;
+            document.getElementById('txt-reg-title').textContent = t.regTitle;
+            document.getElementById('btn-reg').textContent = t.btnReg;
+            document.getElementById('txt-has-acc').textContent = t.hasAcc;
+            document.getElementById('link-login').textContent = t.linkLogin;
+            document.getElementById('ph-email-login').placeholder = t.emailLogin;
+            document.getElementById('ph-pass-login').placeholder = t.passLogin;
+            document.getElementById('ph-name').placeholder = t.name;
+            document.getElementById('ph-email-reg').placeholder = t.emailReg;
+            document.getElementById('ph-phone').placeholder = t.phone;
+            document.getElementById('ph-pass-reg').placeholder = t.passReg;
+            setDynamicGreeting();
+        }
+
+        window.toggleLanguage = function () {
+            window.currentLang = window.currentLang === 'bn' ? 'en' : 'bn';
+            updateTexts();
+            document.documentElement.lang = window.currentLang;
+        };
+
+        window.onload = function () {
+            setDynamicGreeting();
+            document.querySelector('#login-form input').focus();
+        };
+
+        window.toggleForm = function () {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const container = document.querySelector('.container');
+
+            container.style.transform = 'scale(0.98)';
+            setTimeout(() => container.style.transform = 'scale(1)', 200);
+
+            if (loginForm.classList.contains('active')) {
+                loginForm.classList.remove('active');
+                registerForm.classList.add('active');
+                registerForm.querySelector('input').focus();
+            } else {
+                registerForm.classList.remove('active');
+                loginForm.classList.add('active');
+                loginForm.querySelector('input').focus();
+            }
+        };
+
+        window.togglePasswordVisibility = function (inputId, iconElement) {
+            const passInput = document.getElementById(inputId);
+            const eyeSvg = iconElement.querySelector('svg');
+
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeSvg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                passInput.type = 'password';
+                eyeSvg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        };
+
+        // ম্যানুয়াল রেজিস্ট্রেশন
+        document.getElementById('btn-reg').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('ph-email-reg').value;
+            const password = document.getElementById('ph-pass-reg').value;
+            const name = document.getElementById('ph-name').value;
+            const phone = document.getElementById('ph-phone').value;
+
+            if (email === "" || password === "" || name === "" || phone === "") {
+                alert(window.currentLang === 'bn' ? "দয়া করে সব তথ্য পূরণ করুন!" : "Please fill in all details!");
+                return;
+            }
+
+            window.isProcessRunning = true;
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await setDoc(doc(db, "users", user.uid), {
+                    name: name, email: email, phone: phone, uid: user.uid, createdAt: new Date()
+                });
+
+                alert(window.currentLang === 'bn' ? "নিবন্ধন সফল হয়েছে!" : "Registration Successful!");
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                window.isProcessRunning = false;
+                alert("Error: " + error.message);
+            }
+        });
+
+        // ম্যানুয়াল লগইন
+        document.getElementById('btn-login').addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('ph-email-login').value;
+            const password = document.getElementById('ph-pass-login').value;
+
+            if (email === "" || password === "") {
+                alert(window.currentLang === 'bn' ? "ইমেইল এবং পাসওয়ার্ড দিন!" : "Please enter email and password!");
+                return;
+            }
+
+            window.isProcessRunning = true;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    alert(window.currentLang === 'bn' ? "লগইন সফল হয়েছে!" : "Login Successful!");
+
+                    if (ADMIN_EMAILS.includes(user.email)) {
+                        window.location.href = "admin.html";
+                    } else {
+                        window.location.href = "dashboard.html";
+                    }
+                })
+                .catch((error) => {
+                    window.isProcessRunning = false;
+                    alert(window.currentLang === 'bn' ? "ভুল ইমেইল বা পাসওয়ার্ড!" : "Invalid email or password!");
+                });
+        });
+
+        // গুগল লগইন
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById('btn-google').addEventListener('click', () => {
+            window.isProcessRunning = true;
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+                    if (ADMIN_EMAILS.includes(user.email)) {
+                        window.location.href = "admin.html";
+                    } else {
+                        window.location.href = "dashboard.html";
+                    }
+                }).catch((error) => {
+                    window.isProcessRunning = false;
+                    console.error("Google Login Error:", error);
+                    alert(window.currentLang === 'bn' ? "গুগল লগইন বাতিল হয়েছে অথবা কাজ করছে না।" : "Google login cancelled or failed.");
+                });
+        });
+    </script>
+
+</body>
+
+</html>

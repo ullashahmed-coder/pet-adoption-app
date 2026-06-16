@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adopted Pets - PetAdopt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap');
+
+        :root {
+            --primary-peach: #ffaa80;
+            --mint-green: #d0f0c0;
+            --dark-blue: #2c3e50;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-gray: #666;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', 'Hind Siliguri', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--dark-blue); }
+
+        /* Navbar */
+        header { background-color: var(--card-bg); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary-peach); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-links-container { display: flex; align-items: center; gap: 20px; }
+        .nav-link { text-decoration: none; color: #2c3e50; font-weight: 600; transition: 0.3s; }
+        .nav-link:hover { color: var(--primary-peach); }
+        .user-actions { display: flex; align-items: center; gap: 20px; }
+        .logout-btn { background: #ffebe0; color: #ff5e5e; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .logout-btn:hover { background: #ffdbdb; }
+
+        /* Main Content */
+        main { padding: 40px 50px; max-width: 1200px; margin: 0 auto; }
+
+        .welcome-banner { background: linear-gradient(135deg, #a8e08d, #d0f0c0); border-radius: 20px; padding: 40px; color: #2b5329; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(168, 224, 141, 0.3); }
+        .welcome-text h1 { font-size: 32px; margin-bottom: 10px; }
+        .welcome-text p { font-size: 16px; font-weight: 600; opacity: 0.9; }
+
+        /* Pet Grid */
+        .pet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .pet-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: transform 0.3s ease; position: relative; display: flex; flex-direction: column; opacity: 0.9;}
+        .pet-card:hover { transform: translateY(-5px); opacity: 1;}
+        .pet-img { width: 100%; height: 220px; object-fit: cover; filter: grayscale(20%); transition: 0.3s;}
+        .pet-card:hover .pet-img { filter: grayscale(0%); }
+        
+        .pet-badge { position: absolute; top: 15px; right: 15px; background: #27ae60; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+        
+        .pet-info { padding: 20px; flex: 1; display: flex; flex-direction: column; text-align: center;}
+        .pet-name { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+        .pet-breed { color: var(--text-gray); font-size: 14px; margin-bottom: 15px; }
+        
+        .success-msg { background: #e8f8f5; color: #27ae60; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; margin-top: auto; border: 1px dashed #27ae60;}
+
+        /* Loading / No Data */
+        .loading { text-align: center; padding: 50px; font-size: 18px; color: #666; grid-column: 1 / -1; }
+        .no-data { text-align: center; padding: 50px; font-size: 18px; color: #e74c3c; grid-column: 1 / -1; background: #fff; border-radius: 10px; border: 1px dashed #ccc;}
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; padding: 15px 20px; }
+            .nav-links-container { flex-wrap: wrap; justify-content: center; }
+            main { padding: 20px; }
+            .welcome-banner { flex-direction: column; text-align: center; gap: 20px;}
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="dashboard.html" class="logo" style="text-decoration: none;">🐾 PetAdopt</a>
+    
+    <div class="nav-links-container">
+        <a href="dashboard.html" class="nav-link">⬅ ড্যাশবোর্ডে ফিরে যান</a>
+        <a href="profile.html" class="nav-link">আমার প্রোফাইল</a>
+    </div>
+
+    <div class="user-actions">
+        <span id="user-email" style="font-weight: 600; font-size: 14px;">অপেক্ষা করুন...</span>
+        <button class="logout-btn" id="btn-logout">লগআউট</button>
+    </div>
+</header>
+
+<main>
+    <div class="welcome-banner">
+        <div class="welcome-text">
+            <h1>হ্যাপি অ্যাডপশন! 🎉</h1>
+            <p>এই মিষ্টি প্রাণীগুলো আমাদের প্ল্যাটফর্মের মাধ্যমে তাদের নতুন ও ভালোবাসার পরিবার খুঁজে পেয়েছে।</p>
+        </div>
+        <div style="font-size: 60px;">❤️🐕</div>
+    </div>
+
+    <div class="pet-grid" id="adopted-pet-container">
+        <div class="loading">ডেটাবেস থেকে তথ্য লোড হচ্ছে... ⏳</div>
+    </div>
+</main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDf00oO6ALBMs9902GTcrxTn_UVSdoIjiE",
+        authDomain: "pet-adoption-app-11812.firebaseapp.com",
+        projectId: "pet-adoption-app-11812",
+        storageBucket: "pet-adoption-app-11812.firebasestorage.app",
+        messagingSenderId: "365981358842",
+        appId: "1:365981358842:web:b8e651acd7753a2eee0743",
+        measurementId: "G-8TF742MTJB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const docSnap = await getDoc(doc(db, "users", user.uid));
+                document.getElementById('user-email').textContent = docSnap.exists() ? docSnap.data().name : user.email.split('@')[0];
+            } catch(e) { document.getElementById('user-email').textContent = user.email.split('@')[0]; }
+            
+            fetchAdoptedPets();
+        } else {
+            window.location.href = "index.html"; 
+        }
+    });
+
+    async function fetchAdoptedPets() {
+        const container = document.getElementById('adopted-pet-container');
+        try {
+            // 🌟 শুধুমাত্র Adopted প্রাণীগুলো আনা হচ্ছে 🌟
+            const q = query(collection(db, "pets"), where("status", "==", "Adopted"));
+            const querySnapshot = await getDocs(q);
+            container.innerHTML = '';
+            
+            if(querySnapshot.empty) {
+                container.innerHTML = '<div class="no-data" style="grid-column: 1/-1;">এখনো কোনো প্রাণী আমাদের প্ল্যাটফর্ম থেকে দত্তক নেওয়া হয়নি।</div>';
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const pet = doc.data();
+                container.innerHTML += `
+                    <div class="pet-card">
+                        <span class="pet-badge">🎉 Adopted</span>
+                        <img src="${pet.imageUrl}" alt="${pet.name}" class="pet-img" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                        <div class="pet-info">
+                            <h3 class="pet-name">${pet.name}</h3>
+                            <p class="pet-breed">${pet.category} • ${pet.breed}</p>
+                            <div class="success-msg">
+                                একটি সুন্দর পরিবার পেয়েছে ❤️
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            container.innerHTML = '<div class="no-data">ডেটা লোড করতে সমস্যা হচ্ছে!</div>';
+        }
+    }
+
+    document.getElementById('btn-logout').addEventListener('click', () => signOut(auth).then(() => window.location.href = "index.html"));
+</script>
+</body>
+</html>
